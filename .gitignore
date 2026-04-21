@@ -1,0 +1,15 @@
+# Godot
+.godot/
+*.tmp
+*.translation
+export_presets.cfg
+
+# Build outputs
+builds/
+android/
+ios/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
