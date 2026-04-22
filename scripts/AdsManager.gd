@@ -8,6 +8,7 @@ var _ad_showing: bool = false
 var creative_paths: Array[String] = [
 	"res://assets/ad_first.jpg",
 	"res://assets/ad_second.jpg",
+	"res://assets/ad_asila.jpg",
 ]
 var _creative_index: int = 0
 
