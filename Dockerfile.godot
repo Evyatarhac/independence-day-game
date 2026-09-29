@@ -1,0 +1,33 @@
+FROM ubuntu:22.04
+
+ARG GODOT_VERSION=4.7.2-stable
+ARG GODOT_TAG=4.7.2-stable
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates curl python3 unzip \
+    libgl1-mesa-glx libgl1 libxkbcommon0 libasound2 libpulse0 \
+    libfontconfig1 libxrender1 libxcursor1 libxi6 libxinerama1 \
+    libxrandr2 libxtst6 libxxf86vm1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Download Godot editor binary
+RUN curl -sL -o /tmp/godot.zip \
+    "https://github.com/godotengine/godot/releases/download/${GODOT_TAG}/Godot_v${GODOT_TAG}_linux.x86_64.zip" \
+    && python3 -c "import zipfile; zipfile.ZipFile('/tmp/godot.zip').extractall('/usr/local/bin')" \
+    && rm /tmp/godot.zip \
+    && chmod +x /usr/local/bin/Godot_v${GODOT_TAG}_linux.x86_64 \
+    && ln -sf /usr/local/bin/Godot_v${GODOT_TAG}_linux.x86_64 /usr/local/bin/godot
+
+# Download export templates and install only the web ones
+RUN mkdir -p /root/.local/share/godot/export_templates/4.7.2.stable \
+    && curl -sL -o /tmp/templates.tpz \
+    "https://github.com/godotengine/godot/releases/download/${GODOT_TAG}/Godot_v${GODOT_TAG}_export_templates.tpz" \
+    && python3 -c "\
+import zipfile, os; \
+z = zipfile.ZipFile('/tmp/templates.tpz'); \
+dst = '/root/.local/share/godot/export_templates/4.7.2.stable/'; \
+[n for n in z.namelist() if 'web' in n.lower() or 'icudt' in n.lower()]; \
+[open(dst + n.replace('templates/',''), 'wb').write(z.read(n)) for n in z.namelist() if 'web' in n.lower() or 'icudt' in n.lower()]" \
+    && rm /tmp/templates.tpz
+
+WORKDIR /project
